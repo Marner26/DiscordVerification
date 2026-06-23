@@ -33,6 +33,11 @@ app.get('/', (req, res) => {
   res.send('Server is running and ready to handle OAuth2 callbacks!');
 });
 
+// Handle other routes (optional, but good for debugging)
+app.use((req, res, next) => {
+  res.status(404).send('404 Not Found');
+});
+
 // Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
