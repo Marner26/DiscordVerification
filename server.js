@@ -1,28 +1,36 @@
 const express = require('express');
+const axios = require('axios');
 const app = express();
 
 // Handle the OAuth2 callback
-app.get('/auth/callback', (req, res) => {
+app.get('/auth/callback', async (req, res) => {
   // Extract the authorization code from the query parameters
   const code = req.query.code;
 
   if (code) {
-    // Here you would typically exchange the code for an access token
-    // For example, using a library like `axios` to make a POST request to Discord's token endpoint
-    // Example:
-    // const axios = require('axios');
-    // const response = await axios.post('https://discord.com/api/oauth2/token', {
-    //   client_id: 'YOUR_CLIENT_ID',
-    //   client_secret: 'YOUR_CLIENT_SECRET',
-    //   code: code,
-    //   grant_type: 'authorization_code',
-    //   redirect_uri: 'https://reflector-evaporate-stem.ngrok-free.dev/auth/callback',
-    //   scope: 'bot',
-    // });
-    // const accessToken = response.data.access_token;
+    try {
+      // Exchange the code for an access token
+      const response = await axios.post('https://discord.com/api/oauth2/token', null, {
+        params: {
+          client_id: '1518673928795721828',
+          client_secret: '0SAhpBWRlBP_lOK5wLVulwjmbQz6jl3v',
+          code: code,
+          grant_type: 'authorization_code',
+          redirect_uri: 'https://reflector-evaporate-stem.ngrok-free.dev/auth/callback',
+          scope: 'bot',
+        },
+      });
+      
+      // Extract the access token from the response
+      const accessToken = response.data.access_token;
 
-    // For now, we'll just send a success message
-    res.send('OAuth2 callback received and code extracted successfully!');
+      // Send a success message with the access token
+      res.send('OAuth2 callback received and access token obtained successfully!');
+    } catch (error) {
+      // Handle any errors that occur during the token exchange
+      console.error('Error exchanging code for access token:', error);
+      res.status(500).send('An error occurred while exchanging the code for an access token.');
+    }
   } else {
     res.status(400).send('Authorization code not found in the request.');
   }
